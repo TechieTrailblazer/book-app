@@ -1090,6 +1090,31 @@
 		}
 	}
 
+	class CardList extends DivComponent {
+		constructor(appState, parentState) {
+			super();
+			this.appState = appState;
+			this.parentState = parentState;
+		}
+
+		render() {
+			if (this.parentState.loading) {
+				this.el.innerHTML = `<div class="dot-wave">
+  				<div class="dot-wave__dot"></div>
+  				<div class="dot-wave__dot"></div>
+				<div class="dot-wave__dot"></div>
+				<div class="dot-wave__dot"></div>
+				</div>`;
+				return this.el;
+			}
+			this.el.classList.add('card_list');
+			this.el.innerHTML = `
+			<h1>Найдено книг - ${this.parentState.list.length}</h1>
+			`;
+			return this.el;
+		}
+	}
+
 	class MainView extends AbstractView {
 		state = {
 			list: [],
@@ -1102,7 +1127,7 @@
 			super();
 			this.appState = appState;
 			this.appState = onChange(this.appState, this.appStateHook.bind(this));
-			this.state = onChange(this.appState, this.stateHook.bind(this));
+			this.state = onChange(this.state, this.stateHook.bind(this));
 			this.setTitle('Поиск книг');
 		}
 
@@ -1119,6 +1144,9 @@
 				this.state.loading = false;
 				this.state.list = data.docs;
 			}
+			if (path === 'list' || path === 'loading') {
+				this.render();
+			}
 		}
 
 		async loadList(q, offset) {
@@ -1129,6 +1157,7 @@
 		render() {
 			const main = document.createElement('div');
 			main.append(new Search(this.state).render());
+			main.append(new CardList(this.appState, this.state).render());
 			this.app.innerHTML = '';
 			this.app.append(main);
 			this.renderHeader();
