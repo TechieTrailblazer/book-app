@@ -1097,6 +1097,16 @@
 			this.cardState = cardState;
 		}
 
+		#addToFavorites() {
+			this.appState.favourites.push(this.cardState);
+		}
+
+		#deleteFromFavourites() {
+			this.appState.favourites = this.appState.favorites.filter(
+				b => b.key !==  this.cardState.key
+			);
+		}
+
 		render() {
 			this.el.classList.add('card');
 			const existInFavourites = this.appState.favourites.find(
@@ -1127,6 +1137,15 @@
 				</div>
 			</div>
 			`;
+				if (existInFavourites) {
+					this.el
+					.querySelector('button')
+					.addEventListener('click', this.#deleteFromFavourites.bind(this));
+				} else {
+					this.el
+					.querySelector('button')
+					.addEventListener('click', this.#addToFavorites.bind(this));
+				}
 			return this.el;
 		}
 	}
@@ -1178,7 +1197,7 @@
 
 		appStateHook(path) {
 			if (path === 'favourites') {
-				console.log(path);
+				this.render();
 			}
 		}
 
@@ -1187,7 +1206,6 @@
 				this.state.loading = true;
 				const data = await this.loadList(this.state.searchQuery, this.state.offset);
 				this.state.loading = false;
-				console.log(data);
 				this.state.numFound = data.numFound;
 				this.state.list = data.docs;
 			}
